@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869851254456",
+    "project_id": "rampi-1a52d",
+    "storage_bucket": "rampi-1a52d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869851254456:android:6737ff2303fcab53572e4d",
+        "android_client_info": {
+          "package_name": "com.example.rampi_mapeador"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwRPrMec8frQo3p3HMM5wudCDe6DpFCEM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
