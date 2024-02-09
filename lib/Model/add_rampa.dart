@@ -42,7 +42,7 @@ Future<void> adicionar() async {
     String photoId = await uploadPhoto(photo);
     try {
       await FirebaseFirestore.instance.collection('rampas').add({
-        'coordenadas': position,
+        'coordenadas': [position.latitude, position.longitude],
         'data_adicionado': DateTime.now().millisecondsSinceEpoch,
         'inclinacao': 0,
         'condicao': 0,

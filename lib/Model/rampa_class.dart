@@ -1,11 +1,8 @@
-import 'dart:html';
-import 'package:geolocator/geolocator.dart';
-
 class Rampa {
-  Position coordenadas;
+  List<dynamic> coordenadas;
   int dataAdicionado;
-  num inclinacao;
-  num condicao;
+  int inclinacao;
+  int condicao;
   String foto;
   String id;
 
