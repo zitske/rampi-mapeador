@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rampi_mapeador/View/main_view.dart';
 import 'firebase_options.dart';
@@ -13,7 +14,7 @@ Future<void> main() async {
     Permission.location,
     Permission.camera,
   ].request();
-  runApp(const MyApp());
+  runApp(GetMaterialApp(home: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
