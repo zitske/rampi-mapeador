@@ -9,7 +9,8 @@ Future<void> adicionar() async {
   Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high);
   //Pega a foto
-  final XFile? photo = await picker.pickImage(source: ImageSource.camera);
+  final XFile? photo =
+      await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
   //Faz o upload da foto para o Firebase
   Future<String> uploadPhoto(XFile photo) async {
     try {
@@ -47,6 +48,7 @@ Future<void> adicionar() async {
         'inclinacao': 0,
         'condicao': 0,
         'foto': photoId,
+        'approved': false
       });
       print('Rampa added to Firebase');
     } catch (e) {
