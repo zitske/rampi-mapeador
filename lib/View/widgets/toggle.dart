@@ -6,10 +6,12 @@ class ToggleSwitch extends StatefulWidget {
       {super.key,
       required this.index,
       required this.id,
-      required this.selector});
+      required this.selector,
+      required this.blocked});
   final int index;
   final dynamic id;
   final bool selector;
+  final bool blocked;
   @override
   _ToggleSwitchState createState() => _ToggleSwitchState();
 }
@@ -30,14 +32,16 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
       children: [
         GestureDetector(
           onTap: () {
-            setState(() {
-              selectedIndex = 0;
-              if (widget.selector) {
-                editarInclinacao(widget.id);
-              } else {
-                editarCondicao(widget.id);
-              }
-            });
+            if (!widget.blocked) {
+              setState(() {
+                selectedIndex = 0;
+                if (widget.selector) {
+                  editarInclinacao(widget.id);
+                } else {
+                  editarCondicao(widget.id);
+                }
+              });
+            }
           },
           child: Container(
             width: 30,
@@ -55,14 +59,16 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
         SizedBox(width: 10),
         GestureDetector(
           onTap: () {
-            setState(() {
-              selectedIndex = 1;
-              if (widget.selector) {
-                editarInclinacao(widget.id);
-              } else {
-                editarCondicao(widget.id);
-              }
-            });
+            if (!widget.blocked) {
+              setState(() {
+                selectedIndex = 1;
+                if (widget.selector) {
+                  editarInclinacao(widget.id);
+                } else {
+                  editarCondicao(widget.id);
+                }
+              });
+            }
           },
           child: Container(
             width: 30,
@@ -80,14 +86,16 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
         SizedBox(width: 10),
         GestureDetector(
           onTap: () {
-            setState(() {
-              selectedIndex = 2;
-              if (widget.selector) {
-                editarInclinacao(widget.id);
-              } else {
-                editarCondicao(widget.id);
-              }
-            });
+            if (!widget.blocked) {
+              setState(() {
+                selectedIndex = 2;
+                if (widget.selector) {
+                  editarInclinacao(widget.id);
+                } else {
+                  editarCondicao(widget.id);
+                }
+              });
+            }
           },
           child: Container(
             width: 30,

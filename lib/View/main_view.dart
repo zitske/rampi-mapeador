@@ -49,18 +49,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemBuilder: (context, index) {
                         print(snapshot.data?.docs[index].data());
                         return WhiteCard(
-                          Rampa(
-                            coordenadas: snapshot.data?.docs[index]
-                                ['coordenadas'],
-                            dataAdicionado: snapshot.data?.docs[index]
-                                ['data_adicionado'],
-                            inclinacao: snapshot.data?.docs[index]
-                                ['inclinacao'],
-                            condicao: snapshot.data?.docs[index]['condicao'],
-                            foto: snapshot.data?.docs[index]['foto'],
-                            id: snapshot.data!.docs[index].id,
-                          ),
-                        );
+                            Rampa(
+                              coordenadas: snapshot.data?.docs[index]
+                                  ['coordenadas'],
+                              dataAdicionado: snapshot.data?.docs[index]
+                                  ['data_adicionado'],
+                              inclinacao: snapshot.data?.docs[index]
+                                  ['inclinacao'],
+                              condicao: snapshot.data?.docs[index]['condicao'],
+                              foto: snapshot.data?.docs[index]['foto'],
+                              id: snapshot.data!.docs[index].id,
+                            ),
+                            false);
                       }),
                 );
               })),
@@ -90,18 +90,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemBuilder: (context, index) {
                         print(snapshot.data?.docs[index].data());
                         return WhiteCard(
-                          Rampa(
-                            coordenadas: snapshot.data?.docs[index]
-                                ['coordenadas'],
-                            dataAdicionado: snapshot.data?.docs[index]
-                                ['data_adicionado'],
-                            inclinacao: snapshot.data?.docs[index]
-                                ['inclinacao'],
-                            condicao: snapshot.data?.docs[index]['condicao'],
-                            foto: snapshot.data?.docs[index]['foto'],
-                            id: snapshot.data!.docs[index].id,
-                          ),
-                        );
+                            Rampa(
+                              coordenadas: snapshot.data?.docs[index]
+                                  ['coordenadas'],
+                              dataAdicionado: snapshot.data?.docs[index]
+                                  ['data_adicionado'],
+                              inclinacao: snapshot.data?.docs[index]
+                                  ['inclinacao'],
+                              condicao: snapshot.data?.docs[index]['condicao'],
+                              foto: snapshot.data?.docs[index]['foto'],
+                              id: snapshot.data!.docs[index].id,
+                            ),
+                            true);
                       }),
                 );
               })),
@@ -133,18 +133,18 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemBuilder: (context, index) {
                         print(snapshot.data?.docs[index].data());
                         return WhiteCard(
-                          Rampa(
-                            coordenadas: snapshot.data?.docs[index]
-                                ['coordenadas'],
-                            dataAdicionado: snapshot.data?.docs[index]
-                                ['data_adicionado'],
-                            inclinacao: snapshot.data?.docs[index]
-                                ['inclinacao'],
-                            condicao: snapshot.data?.docs[index]['condicao'],
-                            foto: snapshot.data?.docs[index]['foto'],
-                            id: snapshot.data!.docs[index].id,
-                          ),
-                        );
+                            Rampa(
+                              coordenadas: snapshot.data?.docs[index]
+                                  ['coordenadas'],
+                              dataAdicionado: snapshot.data?.docs[index]
+                                  ['data_adicionado'],
+                              inclinacao: snapshot.data?.docs[index]
+                                  ['inclinacao'],
+                              condicao: snapshot.data?.docs[index]['condicao'],
+                              foto: snapshot.data?.docs[index]['foto'],
+                              id: snapshot.data!.docs[index].id,
+                            ),
+                            true);
                       }),
                 );
               })),

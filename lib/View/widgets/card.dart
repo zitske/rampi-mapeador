@@ -6,32 +6,65 @@ import 'package:intl/intl.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class WhiteCard extends StatelessWidget {
-  WhiteCard(this.rampa);
+  WhiteCard(this.rampa, this.blocked);
 
   final Rampa rampa;
+  final bool blocked;
   @override
   Widget build(BuildContext context) {
     var date = DateTime.fromMillisecondsSinceEpoch(rampa.dataAdicionado);
     String formattedDate = DateFormat('dd/MM/yyyy').format(date);
     return Dismissible(
+      direction: blocked ? DismissDirection.none : DismissDirection.horizontal,
       key: UniqueKey(),
       onDismissed: (direction) async {
-        try {
-          // Replace 'rampaId' with the actual ID of the rampa you want to delete
-          await firebase_storage.FirebaseStorage.instance
-              .refFromURL(rampa.foto)
-              .delete();
+        if (direction == DismissDirection.startToEnd) {
+          print('start to end');
+          try {
+            await FirebaseFirestore.instance
+                .collection('rampas')
+                .doc(rampa.id)
+                .set({
+              'review': true,
+              'approved': false,
+              'assessment': false,
+            }, SetOptions(merge: true));
+            print('Rampa added to Firebase');
+          } catch (e) {
+            print('Error adding rampa to Firebase: $e');
+          }
+        } else {
+          try {
+            // Replace 'rampaId' with the actual ID of the rampa you want to delete
+            await firebase_storage.FirebaseStorage.instance
+                .refFromURL(rampa.foto)
+                .delete();
 
-          await FirebaseFirestore.instance
-              .collection('rampas')
-              .doc(rampa.id)
-              .delete();
-          print('Rampa deleted from Firebase');
-        } catch (e) {
-          print('Error deleting rampa from Firebase: $e');
+            await FirebaseFirestore.instance
+                .collection('rampas')
+                .doc(rampa.id)
+                .delete();
+            print('Rampa deleted from Firebase');
+          } catch (e) {
+            print('Error deleting rampa from Firebase: $e');
+          }
         }
       },
       background: Container(
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Icon(
+          Icons.send,
+          color: Colors.white,
+          size: 30,
+        ),
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.only(left: 20.0),
+        margin: EdgeInsets.symmetric(vertical: 10.0),
+      ),
+      secondaryBackground: Container(
         decoration: BoxDecoration(
           color: Colors.red,
           borderRadius: BorderRadius.circular(10.0),
@@ -116,14 +149,21 @@ class WhiteCard extends StatelessWidget {
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   ToggleSwitch(
-                      index: rampa.inclinacao, selector: true, id: rampa.id),
+                    index: rampa.inclinacao,
+                    selector: true,
+                    id: rampa.id,
+                    blocked: blocked,
+                  ),
                   Spacer(),
                   Text(
                     'Condição',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   ToggleSwitch(
-                      index: rampa.condicao, selector: false, id: rampa.id),
+                      index: rampa.condicao,
+                      selector: false,
+                      id: rampa.id,
+                      blocked: blocked),
                 ])
               ],
             ),

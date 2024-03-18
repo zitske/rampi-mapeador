@@ -48,7 +48,9 @@ Future<void> adicionar() async {
         'inclinacao': 0,
         'condicao': 0,
         'foto': photoId,
-        'approved': false
+        'approved': false,
+        'review': false,
+        'assessment': true,
       });
       print('Rampa added to Firebase');
     } catch (e) {
