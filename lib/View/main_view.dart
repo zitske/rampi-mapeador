@@ -26,8 +26,10 @@ class _MyHomePageState extends State<MyHomePage> {
       Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
           child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('rampas').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('rampas')
+                  .where("assessment", isEqualTo: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
@@ -65,8 +67,10 @@ class _MyHomePageState extends State<MyHomePage> {
       Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
           child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('rampas').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('rampas')
+                  .where("review", isEqualTo: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
@@ -104,8 +108,10 @@ class _MyHomePageState extends State<MyHomePage> {
       Padding(
           padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
           child: StreamBuilder<QuerySnapshot>(
-              stream:
-                  FirebaseFirestore.instance.collection('rampas').snapshots(),
+              stream: FirebaseFirestore.instance
+                  .collection('rampas')
+                  .where("approved", isEqualTo: true)
+                  .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(
