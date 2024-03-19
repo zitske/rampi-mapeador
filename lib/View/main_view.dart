@@ -31,6 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
               stream: FirebaseFirestore.instance
                   .collection('rampas')
                   .where("assessment", isEqualTo: true)
+                  .where('creatorId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -72,6 +74,8 @@ class _MyHomePageState extends State<MyHomePage> {
               stream: FirebaseFirestore.instance
                   .collection('rampas')
                   .where("review", isEqualTo: true)
+                  .where('creatorId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -113,6 +117,8 @@ class _MyHomePageState extends State<MyHomePage> {
               stream: FirebaseFirestore.instance
                   .collection('rampas')
                   .where("approved", isEqualTo: true)
+                  .where('creatorId',
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
