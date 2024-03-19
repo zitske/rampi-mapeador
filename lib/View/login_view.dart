@@ -6,6 +6,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:rampi_mapeador/Controller/navigation.dart';
 import 'package:rampi_mapeador/View/main_view.dart';
 import 'package:rampi_mapeador/View/recover_view.dart';
+import 'package:rampi_mapeador/View/register_view.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -133,7 +134,10 @@ class _LoginScreenState extends State<LoginScreen> {
               alignment: Alignment.bottomCenter,
               child: TextButton(
                 onPressed: () {
-                  // Implement your register logic here
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegisterScreen()));
                 },
                 child: Text(
                   'Ainda não tem conta? Cadastre-se!',
