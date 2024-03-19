@@ -5,19 +5,22 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:rampi_mapeador/Controller/navigation.dart';
 import 'package:rampi_mapeador/View/main_view.dart';
-import 'package:rampi_mapeador/View/recover_view.dart';
 
-class LoginScreen extends StatefulWidget {
+class RecoverScreen extends StatefulWidget {
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RecoverScreen> createState() => _RecoverScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RecoverScreenState extends State<RecoverScreen> {
   @override
   Widget build(BuildContext context) {
     final Controller c = Get.find();
     return Obx(() => Scaffold(
-            body: Stack(children: [
+        appBar: AppBar(
+          centerTitle: true,
+          title: Image.asset('assets/logo.png', width: 100.0),
+        ),
+        body: Stack(children: [
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -31,7 +34,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Image.asset('assets/logo.png', width: 300.0),
+                    Text("Recuperar senha",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30.0,
+                            fontWeight: FontWeight.bold)),
                     SizedBox(height: 30.0),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.0),
@@ -50,58 +57,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    SizedBox(height: 10.0),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30.0),
-                      child: TextFormField(
-                        controller: c.passwordController.value,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          labelStyle: TextStyle(color: Colors.white),
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.2),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 30.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RecoverScreen()));
-                            },
-                            child: Text(
-                              'Esqueceu a senha?',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                     SizedBox(height: 20.0),
                     ElevatedButton(
                       onPressed: () {
                         c.loadingLogin.value = true;
                         FirebaseAuth.instance
-                            .signInWithEmailAndPassword(
-                                email: c.emailController.value.text,
-                                password: c.passwordController.value.text)
+                            .sendPasswordResetEmail(
+                                email: c.emailController.value.text)
                             .then((value) {
                           c.loadingLogin.value = false;
-                          c.isLogged.value = true;
-                          Get.to(() => MyHomePage(title: 'Mapeador de Rampas'));
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Email enviado com sucesso'),
+                          ));
+                          Navigator.pop(context);
                         }).catchError((error) {
                           print(error);
                           c.loadingLogin.value = false;
@@ -113,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: c.loadingLogin.value
                           ? Image.asset('assets/loading.gif', width: 30.0)
-                          : Text('Login'),
+                          : Text('Recuperar'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.blue,
                         backgroundColor: Colors.white,
@@ -128,20 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: TextButton(
-                onPressed: () {
-                  // Implement your register logic here
-                },
-                child: Text(
-                  'Ainda não tem conta? Cadastre-se!',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          )
         ])));
   }
 }
