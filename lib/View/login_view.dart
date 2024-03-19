@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -99,9 +100,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             .signInWithEmailAndPassword(
                                 email: c.emailController.value.text,
                                 password: c.passwordController.value.text)
-                            .then((value) {
+                            .then((value) async {
                           c.loadingLogin.value = false;
                           c.isLogged.value = true;
+                          try {
+                            await FirebaseFirestore.instance
+                                .collection('users')
+                                .doc(value.user!.uid)
+                                .get()
+                                .then((value) {
+                              c.userName.value = value['name'];
+                              c.userLastName.value = value['lastname'];
+                              c.userPoints.value = value['points'];
+                            });
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(e.toString()),
+                            ));
+                          }
                           Get.to(() => MyHomePage(title: 'Mapeador de Rampas'));
                         }).catchError((error) {
                           print(error);

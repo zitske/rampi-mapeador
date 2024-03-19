@@ -11,4 +11,7 @@ class Controller extends GetxController {
   Rx<TextEditingController> lastnameController = TextEditingController().obs;
   RxBool isLogged = false.obs;
   RxBool loadingLogin = false.obs;
+  RxString userName = ''.obs;
+  RxString userLastName = ''.obs;
+  RxInt userPoints = 0.obs;
 }

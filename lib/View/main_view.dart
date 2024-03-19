@@ -171,14 +171,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: TextStyle(color: Colors.white),
                         ),
                         Text(
-                          'Nome do usuário',
+                          c.userName.value + ' ' + c.userLastName.value,
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
                               color: Colors.white),
                         ),
                         Text(
-                          '10 pontos',
+                          '${c.userPoints} pontos',
                           style: TextStyle(
                               fontWeight: FontWeight.w300,
                               fontSize: 20,
