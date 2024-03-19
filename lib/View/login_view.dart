@@ -101,6 +101,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         }).catchError((error) {
                           print(error);
                           c.loadingLogin.value = false;
+
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text(error.toString()),
+                          ));
                         });
                       },
                       child: c.loadingLogin.value
