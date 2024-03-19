@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:rampi_mapeador/Controller/navigation.dart';
 import 'package:rampi_mapeador/Model/add_rampa.dart';
 import 'package:rampi_mapeador/Model/rampa_class.dart';
+import 'package:rampi_mapeador/View/login_view.dart';
 import 'package:rampi_mapeador/View/widgets/card.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -152,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final Controller c = Get.find();
     return Obx(() => Scaffold(
           appBar: AppBar(
-            backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+            backgroundColor: Color(0xFF0191E2),
             title: Text(widget.title),
           ),
           drawer: Drawer(
@@ -201,7 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.red,
                   ),
                   onTap: () {
-                    Navigator.pop(context);
+                    FirebaseAuth.instance.signOut();
+                    c.isLogged.value = false;
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => LoginScreen()));
                   },
                 ),
               ],
