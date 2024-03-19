@@ -164,11 +164,23 @@ class _MyHomePageState extends State<MyHomePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Olá,'),
+                        Text(
+                          'Olá,',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         Text(
                           'Nome do usuário',
                           style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 20),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                              color: Colors.white),
+                        ),
+                        Text(
+                          '10 pontos',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 20,
+                              color: Colors.white),
                         )
                       ]),
                   decoration: BoxDecoration(
