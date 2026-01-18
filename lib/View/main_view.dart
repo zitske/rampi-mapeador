@@ -3,23 +3,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:rampi_mapeador/Controller/navigation.dart';
-import 'package:rampi_mapeador/Model/add_rampa.dart';
 import 'package:rampi_mapeador/Model/rampa_class.dart';
 import 'package:rampi_mapeador/services/supabase_service.dart';
 import 'package:rampi_mapeador/View/login_view.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rampi_mapeador/features/rampa/presentation/controllers/add_rampa_controller.dart';
 import 'package:rampi_mapeador/View/widgets/card.dart';
 import 'package:rampi_mapeador/View/widgets/map_widget.dart';
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends ConsumerState<MyHomePage> {
   bool get isLoggedIn => SupabaseService.getCurrentUser() != null;
 
   void _checkAuthAndNavigate(int index) {
@@ -744,12 +745,24 @@ class _MyHomePageState extends State<MyHomePage> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: FloatingActionButton.extended(
-                  onPressed: () {
-                    if (isLoggedIn) {
-                      adicionar();
-                    } else {
+                  onPressed: () async {
+                    if (!isLoggedIn) {
                       _showLoginDialog();
+                      return;
                     }
+
+                    final user = SupabaseService.getCurrentUser();
+                    if (user == null) return;
+
+                    final controller =
+                        ref.read(addRampaControllerProvider.notifier);
+
+                    await controller.addRampaFlow(userId: user.id);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Rampa enviada (se houver foto).')),
+                    );
                   },
                   backgroundColor: Color(0xFF0191E2).withOpacity(0.9),
                   elevation: 0,

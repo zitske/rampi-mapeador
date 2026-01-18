@@ -1,162 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:rampi_mapeador/Model/rampa_class.dart';
-import 'package:rampi_mapeador/services/supabase_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:rampi_mapeador/features/rampa/presentation/providers/rampas_notifier.dart';
+import 'package:rampi_mapeador/features/rampa/domain/entities/rampa.dart';
 
-class MapView extends StatefulWidget {
+class MapView extends ConsumerStatefulWidget {
   const MapView({super.key});
 
   @override
-  State<MapView> createState() => _MapViewState();
+  ConsumerState<MapView> createState() => _MapViewState();
 }
 
-class _MapViewState extends State<MapView> {
-  MapController mapController = MapController();
+class _MapViewState extends ConsumerState<MapView> {
+  final MapController _mapController = MapController();
   LatLng? currentLocation;
-  LatLng? userLocation; // Localização real do usuário
-  bool isLoading = true;
-  List<Rampa> rampas = [];
-  bool isSatelliteView = true; // Inicia com visão satélite
+  bool isSatelliteView = true;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    _loadRampas();
-  }
-
-  Future<void> _getCurrentLocation() async {
-    // Define localização inicial padrão como UFSM
-    setState(() {
-      currentLocation = LatLng(
-          -29.7205, -53.7149); // UFSM - Universidade Federal de Santa Maria
-      isLoading = false;
-    });
-
-    // Tenta obter localização real do usuário em background
-    try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      setState(() {
-        userLocation = LatLng(position.latitude, position.longitude);
-      });
-    } catch (e) {
-      print('Erro ao obter localização do usuário: $e');
-      // Mantém a localização da UFSM se não conseguir obter a do usuário
-      userLocation = currentLocation;
-    }
-  }
-
-  Future<void> _loadRampas() async {
-    try {
-      final data = await SupabaseService.fetchRampas();
-      setState(() {
-        rampas = data.map((doc) {
-          return Rampa(
-            coordenadas: [doc['latitude'], doc['longitude']],
-            dataAdicionado: doc['data_adicionado'],
-            inclinacao: doc['inclinacao'],
-            condicao: doc['condicao'],
-            foto: doc['foto'],
-            id: doc['id'].toString(),
-          );
-        }).toList();
-      });
-    } catch (e) {
-      print('Erro ao carregar rampas: $e');
-    }
+    currentLocation = const LatLng(-29.7205, -53.7149);
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading || currentLocation == null) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xFF0191E2),
-          title: Text('Mapa de Rampas'),
-        ),
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+    final rampasAsync = ref.watch(rampasProvider);
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF0191E2),
-        title: Text('Mapa de Rampas'),
+        backgroundColor: const Color(0xFF0191E2),
+        title: const Text('Mapa de Rampas'),
       ),
-      body: FlutterMap(
-        mapController: mapController,
-        options: MapOptions(
-          initialCenter: currentLocation!,
-          initialZoom: 15.0,
-          minZoom: 5.0,
-          maxZoom: 18.0,
+      body: rampasAsync.when(
+        data: (rampas) => FlutterMap(
+          mapController: _mapController,
+          options: MapOptions(
+            initialCenter: currentLocation!,
+            initialZoom: 15.0,
+            minZoom: 5.0,
+            maxZoom: 18.0,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: isSatelliteView
+                  ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                  : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.example.rampi_mapeador',
+              maxZoom: 19,
+            ),
+            MarkerLayer(
+              markers:
+                  rampas.map((rampa) => _buildMarkerForRampa(rampa)).toList(),
+            ),
+          ],
         ),
-        children: [
-          TileLayer(
-            urlTemplate: isSatelliteView
-                ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-                : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.example.rampi_mapeador',
-            maxZoom: 19,
-          ),
-          MarkerLayer(
-            markers: [
-              // Marcadores das rampas aprovadas
-              ...rampas.map((rampa) {
-                return Marker(
-                  point: LatLng(
-                    rampa.coordenadas[0].toDouble(),
-                    rampa.coordenadas[1].toDouble(),
-                  ),
-                  width: 80,
-                  height: 80,
-                  child: GestureDetector(
-                    onTap: () {
-                      _showRampaDetails(rampa);
-                    },
-                    child: Icon(
-                      Icons.wheelchair_pickup,
-                      color: _getColorByCondition(rampa.condicao),
-                      size: 40,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ],
-          ),
-        ],
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, st) => Center(child: Text('Erro ao carregar rampas: $e')),
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            heroTag: 'mapView',
-            onPressed: () {
-              setState(() {
-                isSatelliteView = !isSatelliteView;
-              });
-            },
+            heroTag: 'mapViewToggle',
+            onPressed: () => setState(() => isSatelliteView = !isSatelliteView),
             child: Icon(isSatelliteView ? Icons.map : Icons.satellite),
-            tooltip: isSatelliteView ? 'Mapa' : 'Satélite',
-          ),
-          SizedBox(height: 10),
-          FloatingActionButton(
-            heroTag: 'mapLocation',
-            onPressed: () {
-              if (userLocation != null) {
-                mapController.move(userLocation!, 16.0);
-              }
-            },
-            backgroundColor: userLocation != null ? null : Colors.grey,
-            child: Icon(Icons.my_location),
-            tooltip: 'Ir para Minha Localização',
           ),
         ],
+      ),
+    );
+  }
+
+  Marker _buildMarkerForRampa(Rampa rampa) {
+    return Marker(
+      point: LatLng(rampa.latitude, rampa.longitude),
+      width: 80,
+      height: 80,
+      child: GestureDetector(
+        onTap: () => _showRampaDetails(rampa),
+        child: Icon(Icons.wheelchair_pickup,
+            color: _getColorByCondition(rampa.condicao), size: 40),
       ),
     );
   }
@@ -179,44 +102,33 @@ class _MapViewState extends State<MapView> {
       context: context,
       builder: (context) {
         return Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Detalhes da Rampa',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
+              const Text('Detalhes da Rampa',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  rampa.foto,
-                  height: 150,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: Image.network(rampa.foto,
+                    height: 150, width: double.infinity, fit: BoxFit.cover),
               ),
-              SizedBox(height: 10),
-              Text('Latitude: ${rampa.coordenadas[0]}'),
-              Text('Longitude: ${rampa.coordenadas[1]}'),
+              const SizedBox(height: 10),
+              Text('Latitude: ${rampa.latitude}'),
+              Text('Longitude: ${rampa.longitude}'),
               Text('Inclinação: ${rampa.inclinacao}°'),
               Text('Condição: ${_getConditionText(rampa.condicao)}'),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton.icon(
                 onPressed: () {
-                  mapController.move(
-                    LatLng(
-                      rampa.coordenadas[0].toDouble(),
-                      rampa.coordenadas[1].toDouble(),
-                    ),
-                    18.0,
-                  );
+                  _mapController.move(
+                      LatLng(rampa.latitude, rampa.longitude), 18.0);
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.location_on),
-                label: Text('Ir para localização'),
+                icon: const Icon(Icons.location_on),
+                label: const Text('Ir para localização'),
               ),
             ],
           ),
