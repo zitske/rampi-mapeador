@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:rampi_mapeador/services/supabase_service.dart';
 
 class ToggleSwitch extends StatefulWidget {
   ToggleSwitch(
@@ -116,27 +116,23 @@ class _ToggleSwitchState extends State<ToggleSwitch> {
 
   Future<void> editarInclinacao(dynamic id) async {
     try {
-      // Replace 'rampaId' with the actual ID of the rampa you want to edit
-      await FirebaseFirestore.instance
-          .collection('rampas')
-          .doc(widget.id)
-          .update({'inclinacao': selectedIndex});
-      print('Rampa edited on Firebase');
+      await SupabaseService.client
+          .from('rampas')
+          .update({'inclinacao': selectedIndex}).eq('id', widget.id);
+      print('Rampa edited on Supabase');
     } catch (e) {
-      print('Error editing rampa on Firebase: $e');
+      print('Error editing rampa on Supabase: $e');
     }
   }
 
   Future<void> editarCondicao(dynamic id) async {
     try {
-      // Replace 'rampaId' with the actual ID of the rampa you want to edit
-      await FirebaseFirestore.instance
-          .collection('rampas')
-          .doc(widget.id)
-          .update({'condicao': selectedIndex});
-      print('Rampa edited on Firebase');
+      await SupabaseService.client
+          .from('rampas')
+          .update({'condicao': selectedIndex}).eq('id', widget.id);
+      print('Rampa edited on Supabase');
     } catch (e) {
-      print('Error editing rampa on Firebase: $e');
+      print('Error editing rampa on Supabase: $e');
     }
   }
 }

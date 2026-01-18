@@ -1,8 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:rampi_mapeador/services/supabase_service.dart';
 
 Future<void> adicionar() async {
   final ImagePicker picker = ImagePicker();
@@ -12,51 +10,34 @@ Future<void> adicionar() async {
   //Pega a foto
   final XFile? photo =
       await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
-  //Faz o upload da foto para o Firebase
-  Future<String> uploadPhoto(XFile photo) async {
-    try {
-      // Create a reference to the Firebase Cloud Storage bucket
-      final firebase_storage.Reference ref = firebase_storage
-          .FirebaseStorage.instance
-          .ref()
-          .child('photos/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-      // Upload the photo to Firebase Cloud Storage
-      final firebase_storage.UploadTask uploadTask =
-          ref.putData(await photo.readAsBytes());
-
-      // Wait for the upload to complete
-      final firebase_storage.TaskSnapshot taskSnapshot =
-          await uploadTask.whenComplete(() {});
-
-      // Get the download URL of the uploaded photo
-      final String downloadURL = await taskSnapshot.ref.getDownloadURL();
-
-      return downloadURL;
-    } catch (e) {
-      print('Error uploading photo to Firebase Cloud Storage: $e');
-      return '';
-    }
-  }
-
-  //Adiciona a rampa ao Firebase
+  //Adiciona a rampa ao Supabase
   if (photo != null) {
-    String photoId = await uploadPhoto(photo);
     try {
-      await FirebaseFirestore.instance.collection('rampas').add({
-        'coordenadas': [position.latitude, position.longitude],
-        'data_adicionado': DateTime.now().millisecondsSinceEpoch,
-        'inclinacao': 0,
-        'condicao': 0,
-        'foto': photoId,
-        'approved': false,
-        'review': false,
-        'assessment': true,
-        'creatorId': FirebaseAuth.instance.currentUser!.uid,
-      });
-      print('Rampa added to Firebase');
+      final user = SupabaseService.getCurrentUser();
+      if (user != null) {
+        final photoBytes = await photo.readAsBytes();
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+        // Upload da foto
+        final bucket = SupabaseService.client.storage.from('rampi-bucket');
+        final filePath = '${user.id}/$fileName';
+
+        await bucket.uploadBinary(filePath, photoBytes);
+        final publicUrl = bucket.getPublicUrl(filePath);
+
+        // Inserir rampa no banco
+        await SupabaseService.insertRampa(
+          coordenadas: [position.latitude, position.longitude],
+          inclinacao: 0,
+          condicao: 0,
+          foto: publicUrl,
+          creatorId: user.id,
+        );
+        print('Rampa added to Supabase');
+      }
     } catch (e) {
-      print('Error adding rampa to Firebase: $e');
+      print('Error adding rampa to Supabase: $e');
     }
   }
 }

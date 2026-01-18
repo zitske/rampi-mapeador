@@ -1,10 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:rampi_mapeador/Controller/navigation.dart';
-import 'package:rampi_mapeador/View/main_view.dart';
+import 'package:rampi_mapeador/services/supabase_service.dart';
 
 class RecoverScreen extends StatefulWidget {
   @override
@@ -12,15 +8,50 @@ class RecoverScreen extends StatefulWidget {
 }
 
 class _RecoverScreenState extends State<RecoverScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
+
+  Future<void> _handlePasswordReset() async {
+    if (_emailController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, insira seu email')),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await SupabaseService.resetPassword(email: _emailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Email de recuperação enviado com sucesso'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Controller c = Get.find();
-    return Obx(() => Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Image.asset('assets/logo.png', width: 100.0),
-        ),
-        body: Stack(children: [
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Color(0xFF0191E2),
+        title: Image.asset('assets/rampi-logo.png', width: 100.0),
+      ),
+      body: Stack(
+        children: [
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -34,16 +65,19 @@ class _RecoverScreenState extends State<RecoverScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Text("Recuperar senha",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.bold)),
+                    Text(
+                      "Recuperar senha",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     SizedBox(height: 30.0),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 30.0),
                       child: TextFormField(
-                        controller: c.emailController.value,
+                        controller: _emailController,
                         decoration: InputDecoration(
                           labelText: 'Email',
                           labelStyle: TextStyle(color: Colors.white),
@@ -59,28 +93,18 @@ class _RecoverScreenState extends State<RecoverScreen> {
                     ),
                     SizedBox(height: 20.0),
                     ElevatedButton(
-                      onPressed: () {
-                        c.loadingLogin.value = true;
-                        FirebaseAuth.instance
-                            .sendPasswordResetEmail(
-                                email: c.emailController.value.text)
-                            .then((value) {
-                          c.loadingLogin.value = false;
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Email enviado com sucesso'),
-                          ));
-                          Navigator.pop(context);
-                        }).catchError((error) {
-                          print(error);
-                          c.loadingLogin.value = false;
-
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(error.toString()),
-                          ));
-                        });
-                      },
-                      child: c.loadingLogin.value
-                          ? Image.asset('assets/loading.gif', width: 30.0)
+                      onPressed: _isLoading ? null : _handlePasswordReset,
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.blue,
+                                ),
+                              ),
+                            )
                           : Text('Recuperar'),
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.blue,
@@ -96,6 +120,14 @@ class _RecoverScreenState extends State<RecoverScreen> {
               ),
             ),
           ),
-        ])));
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
   }
 }

@@ -1,19 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:rampi_mapeador/Controller/navigation.dart';
-import 'package:rampi_mapeador/View/login_view.dart';
 import 'package:rampi_mapeador/View/main_view.dart';
-import 'firebase_options.dart';
+import 'package:rampi_mapeador/View/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final Controller c = Get.put(Controller());
+  Get.put(Controller());
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  await Supabase.initialize(
+    url: 'https://zitske-group-rampi-supabase.o0p0en.easypanel.host',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyAgCiAgICAicm9sZSI6ICJzZXJ2aWNlX3JvbGUiLAogICAgImlzcyI6ICJzdXBhYmFzZS1kZW1vIiwKICAgICJpYXQiOiAxNjQxNzY5MjAwLAogICAgImV4cCI6IDE3OTk1MzU2MDAKfQ.DaYlNEoUrrEn2Ig7tqibS-PHK5vgusbcbo7X36XVt4Q',
   );
 
   await [
@@ -31,14 +31,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Rampi',
+      title: 'Rampi - Democratizando as ruas',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0191E2)),
       ),
-      home: FirebaseAuth.instance.currentUser == null
-          ? LoginScreen()
-          : const MyHomePage(title: 'Mapeador de Rampas'),
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/home': (context) => const MyHomePage(title: 'Rampi'),
+      },
+      initialRoute: '/',
     );
   }
 }

@@ -5,6 +5,7 @@ class Rampa {
   int condicao;
   String foto;
   String id;
+  String? endereco; // Campo para armazenar o endereço
 
   Rampa({
     required this.coordenadas,
@@ -13,5 +14,6 @@ class Rampa {
     required this.condicao,
     required this.foto,
     required this.id,
+    this.endereco,
   });
 }
